@@ -20,9 +20,6 @@ function MapComponent({ markers }: any) {
   const [map, setMap] = useState(null);
 
   useEffect(() => {
-    console.log("===============markers=====================");
-    console.log(markers);
-    console.log("====================================");
     if (map && markers) {
       onLoad(map);
     }

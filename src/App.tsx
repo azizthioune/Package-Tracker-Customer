@@ -4,8 +4,31 @@ import "./App.css";
 import { IPackageData } from "./types/Package";
 import PackageService from "./services/PackageService";
 import MapComponent from "./components/MapComponent";
+import { SOCKET_URL } from "../http-common";
 
 const App: React.FC = () => {
+  // Create WebSocket connection.
+  const socket = new WebSocket(SOCKET_URL);
+
+  // Connection opened
+  socket.addEventListener("open", function () {
+    console.log("Connected to WS Server");
+  });
+
+  // Listen for messages
+  socket.addEventListener("message", function (event) {
+    if (event?.data && event?.data !== "STATUS_UPDATED") {
+      const deliveryMessage = JSON.parse(event?.data);
+      if (
+        deliveryMessage?.delivery_uid ===
+        currentPackage?.deliveries[0]?.delivery_uid
+      ) {
+        findByTitle();
+      }
+    }
+    console.log("Message from server ", event.data);
+  });
+
   const [currentPackage, setCurrentPackage] = useState<IPackageData | null>(
     null
   );
@@ -29,9 +52,7 @@ const App: React.FC = () => {
 
   const mapMarkers = useMemo(() => {
     let markers: any[] = [];
-    console.log("===============currentPackage=====================");
-    console.log(currentPackage);
-    console.log("====================================");
+
     if (currentPackage && currentPackage?.deliveries?.length) {
       markers = [
         {
@@ -65,7 +86,7 @@ const App: React.FC = () => {
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <a href="/" className="navbar-brand">
-          Aziz Thioune 𓃵
+          Aziz Thioune 𓃵 | Web Tracker
         </a>
       </nav>
 
